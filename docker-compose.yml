@@ -1,15 +1,33 @@
 version: '2'
 
 services:
+
+  nginx: 
+    image: nginx:latest
+    container_name: production_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx:/etc/nginx
+      - /etc/cloudfare:/etc/cloudfare
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - ctfd
+#    networks:
+ #     default:
+  #    internal:
+
   ctfd:
     build: .
     user: root
     restart: always
-    ports:
-      - "8000:8000"
+    container_name: ctfd
+    expose:
+      - "8000"
     environment:
       - UPLOAD_FOLDER=/var/uploads
-      - DATABASE_URL=mysql+pymysql://root:ctfd@db/ctfd
+      - DATABASE_URL=mysql+pymysql://root:ctfd69@db/ctfd
       - REDIS_URL=redis://cache:6379
       - WORKERS=1
       - LOG_FOLDER=/var/log/CTFd
@@ -21,22 +39,22 @@ services:
       - .:/opt/CTFd:ro
     depends_on:
       - db
-    networks:
-        default:
-        internal:
+   # networks:
+    #    default:
+   #     internal:
 
   db:
     image: mariadb:10.4
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=ctfd
+      - MYSQL_ROOT_PASSWORD=ctfd69
       - MYSQL_USER=ctfd
-      - MYSQL_PASSWORD=ctfd
+      - MYSQL_PASSWORD=ctfd69
       - MYSQL_DATABASE=ctfd
     volumes:
       - .data/mysql:/var/lib/mysql
-    networks:
-        internal:
+   # networks:
+    #    internal:
     # This command is required to set important mariadb defaults
     command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
 
@@ -45,10 +63,10 @@ services:
     restart: always
     volumes:
     - .data/redis:/data
-    networks:
-        internal:
+    #networks:
+     #   internal:
 
-networks:
-    default:
-    internal:
-        internal: true
+#networks:
+  #  default:
+  #  internal:
+      #  internal: true
